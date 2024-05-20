@@ -540,3 +540,10 @@ variable "artifact_enable" {
   type        = bool
   default     = true
 }
+// Cluster Version
+variable "cluster_version" {
+  description = "Cluster version in prefix form (i.e. '1.27.') "
+  type        = string
+  default     = ""
+}
+

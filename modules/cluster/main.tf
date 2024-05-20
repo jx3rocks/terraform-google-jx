@@ -21,6 +21,12 @@ locals {
   max_pods_per_node             = local.enable_vpc_native ? var.max_pods_per_node : null
 }
 
+data "google_container_engine_versions" "jx_cluster_version" {
+  provider       = google-beta
+  location       = var.cluster_location
+  version_prefix = var.cluster_version
+}
+
 resource "google_container_cluster" "jx_cluster" {
   name                      = var.cluster_name
   description               = "jenkins-x cluster"
@@ -107,6 +113,9 @@ resource "google_container_node_pool" "primary" {
   location           = var.cluster_location
   cluster            = google_container_cluster.jx_cluster.name
   initial_node_count = var.initial_primary_node_pool_node_count
+  version            = (var.cluster_version == "" ) ? "" : data.google_container_engine_versions.jx_cluster_version.latest_node_version
+//  count = var.enable_primary_node_pool ? 1 : 0
+
 
   autoscaling {
     location_policy = var.autoscaler_location_policy

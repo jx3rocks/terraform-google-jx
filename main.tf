@@ -183,6 +183,7 @@ module "cluster" {
 
   kuberhealthy = var.kuberhealthy
   delete_protect             = var.delete_protect
+  cluster_version = var.cluster_version
 }
 
 // ----------------------------------------------------------------------------
