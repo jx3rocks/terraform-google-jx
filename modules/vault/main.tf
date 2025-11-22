@@ -34,7 +34,7 @@ resource "google_kms_key_ring" "vault_keyring" {
 
 // Hardened KMS KEY RING
   lifecycle {
-    prevent_destroy = true
+#    prevent_destroy = true
     ignore_changes = []
   }
 
