@@ -58,7 +58,6 @@ resource "google_kms_crypto_key" "vault_crypto_key" {
     ignore_changes = [
       rotation_period,
       version_template,
-      next_rotation_time,
       purpose,
       labels,
     ]
