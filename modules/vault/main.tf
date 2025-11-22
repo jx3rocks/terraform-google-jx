@@ -51,7 +51,7 @@ resource "google_kms_crypto_key" "vault_crypto_key" {
 
 // Hardend KMS CRYPTO KEY
   lifecycle {
-    prevent_destroy = true
+#    prevent_destroy = true
 
     # Prevent Terraform from hitting key-version APIs
     # (removes need for roles/cloudkms.admin)
@@ -99,7 +99,7 @@ resource "google_service_account" "vault_sa" {
   display_name = substr("Vault service account for cluster ${var.cluster_name}", 0, 100)
 // HARDENED GOOGLE SA FOR VAULT
   lifecycle {
-    prevent_destroy = true     # GCP SA deletions cascade breakage
+#    prevent_destroy = true     # GCP SA deletions cascade breakage
     ignore_changes = [
       display_name,
       description,
