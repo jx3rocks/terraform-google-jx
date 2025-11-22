@@ -36,7 +36,7 @@ resource "google_kms_key_ring" "vault_keyring" {
   lifecycle {
     prevent_destroy = true
     ignore_changes = [
-      labels,
+      metadata[0].labels,
     ]
   }
 
@@ -62,7 +62,7 @@ resource "google_kms_crypto_key" "vault_crypto_key" {
       version_template,
       next_rotation_time,
       purpose,
-      labels,
+      metadata[0].labels,
     ]
   }
 }
