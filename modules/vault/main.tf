@@ -27,9 +27,19 @@ resource "google_kms_key_ring" "vault_keyring" {
   count = var.external_vault ? 0 : 1
 
   provider   = google
+  project    = var.gcp_project
   name       = "keyring-${var.cluster_name}-${var.cluster_id}"
   location   = "global"
   depends_on = [google_project_service.cloudkms_api]
+
+// Hardened KMS KEY RING
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      labels,
+    ]
+  }
+
 }
 
 resource "google_kms_crypto_key" "vault_crypto_key" {
@@ -40,6 +50,29 @@ resource "google_kms_crypto_key" "vault_crypto_key" {
   key_ring        = google_kms_key_ring.vault_keyring[0].id
   rotation_period = "100000s"
   depends_on      = [google_project_service.cloudkms_api]
+
+// Hardend KMS CRYPTO KEY
+  lifecycle {
+    prevent_destroy = true
+
+    # Prevent Terraform from hitting key-version APIs
+    # (removes need for roles/cloudkms.admin)
+    ignore_changes = [
+      rotation_period,
+      version_template,
+      next_rotation_time,
+      purpose,
+      labels,
+    ]
+  }
+}
+# Optional read-only accessor to avoid version calls
+data "google_kms_crypto_key" "vault_crypto_key_readonly" {
+  count = var.external_vault ? 0 : 1
+  provider = google
+
+  key_ring = google_kms_key_ring.vault_keyring[0].id
+  name     = google_kms_crypto_key.vault_crypto_key[0].name
 }
 
 // ----------------------------------------------------------------------------
@@ -67,6 +100,15 @@ resource "google_service_account" "vault_sa" {
   provider     = google
   account_id   = local.sa_name
   display_name = substr("Vault service account for cluster ${var.cluster_name}", 0, 100)
+// HARDENED GOOGLE SA FOR VAULT
+  lifecycle {
+    prevent_destroy = true     # GCP SA deletions cascade breakage
+    ignore_changes = [
+      display_name,
+      description,
+      disabled,
+    ]
+  }
 }
 
 resource "google_project_iam_member" "vault_sa_storage_object_admin_binding" {
