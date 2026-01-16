@@ -195,7 +195,7 @@ variable "ip_range_services" {
 variable "node_machine_type" {
   description = "Node type for the Kubernetes cluster"
   type        = string
-  default     = "n1-standard-2"
+  default     = "n2-standard-2"
 }
 
 variable "node_preemptible" {
